@@ -1,16 +1,23 @@
 # Math156-Final-Project
 Final Project for Math 156 @ UCLA, Fall 2025.
 
-Group Members:
+Group Members: Michael Mansour, Ezekiel Ito, Gorm Kragh, Adrian Ruiz Doblas, Jadon Zhu
 
-Michael Mansour
+# Abstract
 
-Ezekiel Ito
+# Introduction
 
-Gorm Kragh
+# Background
 
-Adrian Ruiz Doblas,
+# Dataset
 
-Jadon Zhu
+# Model
 
-....
+# Methodology
+
+# Results
+
+# Conclusion
+
+# References
+
