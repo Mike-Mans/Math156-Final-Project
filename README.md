@@ -4,6 +4,10 @@ Michael Mansour, Ezekiel Ito, Gorm Kragh, Adrian Ruiz Doblas, Jadon Zhu
 
 Final Project For Math 156 @ UCLA, Fall 2025
 
+Google Collab Links:
+https://colab.research.google.com/drive/1F95f-NXgdaZ26ch5vTf2Wp3RhtWo46uh#scrollTo=47e257d8
+https://colab.research.google.com/drive/1EYMuinvALF8v0nPjX0JDKWWApgPxb_0u?usp=sharing#scrollTo=shUv-dBTYWvu
+
 ## Abstract
 We present a shallow convolutional neural network (CNN) designed and implemented from scratch to classify one-second audio recordings of spoken commands. Our approach transforms raw audio waveforms into Mel spectrograms using the Short-Time Fourier Transform (STFT), providing 2D time-frequency representations suitable for CNN processing. The model is trained on the Google Speech Commands dataset to distinguish between 10 core command words (yes, no, up, down, left, right, on, off, stop, go), along with an ``unknown'' class for out-of-vocabulary words and a ``silence'' class. The architecture consists of two convolutional blocks with batch normalization and max pooling, followed by adaptive pooling and fully connected layers producing 12-class predictions. We employ automated hyperparameter optimization using Optuna, extensive data augmentation (time shifting, noise addition, and spectrogram masking), and Automatic Mixed Precision training. The final model achieves 81\% test accuracy with weighted average precision and recall of 0.81. The results demonstrate that a relatively simple CNN architecture can achieve reasonable performance on speech command classification when combined with appropriate pre-processing and training techniques.
 \end{abstract}
@@ -227,5 +231,6 @@ Every one of us contributed to the written report.
 ## Acknowledgments
 
 The model inspiration came from the popular ways to analyze the famous Google Speech Commands dataset.
+
 
 
