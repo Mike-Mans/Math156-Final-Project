@@ -1,4 +1,4 @@
-### Speech Command Classification Using Shallow Convolutional Neural Networks on Mel Spectrograms
+# Speech Command Classification Using Shallow Convolutional Neural Networks on Mel Spectrograms
 
 Michael Mansour, Ezekiel Ito, Gorm Kragh, Adrian Ruiz Doblas, Jadon Zhu
 
@@ -17,7 +17,7 @@ CNNs are special types of neural networks that are better fitted for spatial dat
 
 In this section we briefly review supervised classification with neural networks and the basic ideas behind convolutional neural networks (CNNs). These concepts provide the theoretical foundation for the architecture and training procedure used in our project.
 
-# Supervised classification with neural networks
+### Supervised classification with neural networks
 
 We consider a labeled dataset $\mathcal{D} = \{(x_n, t_n)\}_{n=1}^N$, where each input $x_n$ is an instance and $t_n \in \{e_1,\dots,e_K\} \subset \mathbb{R}^K$ is a one–hot label for $K$ classes. A neural network defines a parametric mapping $f_\theta : \mathcal{X} \to \Delta^{K-1}$ from inputs to class probabilities, where $\theta$ collects all weights and biases and $\Delta^{K-1}$ denotes the probability simplex (Bishop, 2006, Sec.~4.3).
 
@@ -28,7 +28,7 @@ In a standard feed–forward network, layers are defined recursively by $h^{(0)}
 \end{equation*}
 with gradients computed via backpropagation (Bishop, 2006, Secs.~4.3, 5.2.4, 5.3).
 
-# Convolutional neural networks
+### Convolutional neural networks
 
 Fully connected networks ignore the spatial structure of their inputs by flattening them into vectors. CNNs instead exploit locality and approximate translation invariance by using local receptive fields, weight sharing, and pooling (Bishop, 2006, Sec.~5.5.6).
 
@@ -39,29 +39,29 @@ Pooling layers aggregate activations in local neighborhoods to build coarser, mo
 
 ## Dataset
 
-# Dataset Description and Source
+### Dataset Description and Source
 
 We use the Google Speech Commands dataset v0.02 \cite{speechcommands_hf, warden2018speechcommands}, which contains 105,829 one-second audio recordings as .wav files sampled at 16 kHz. The dataset was collected through crowdsourcing and contains recordings from thousands of different speakers, with each file clearly labeled by its spoken word class. This labeling serves as our target value for supervised learning. For related CNN approaches on this dataset, see \cite{tang2018deepresidual, majumdar2020matchboxnet}.
 
 We organize the dataset into 12 classes for classification. The 10 core command words (yes, no, up, down, left, right, on, off, stop, go) serve as distinct classes. The remaining 20 auxiliary words (zero, one, two, three, four, five, six, seven, eight, nine, bed, bird, cat, dog, happy, house, Marvin, Sheila, tree, wow) are grouped into a single ``unknown'' class, requiring the model to identify them as out-of-vocabulary words rather than distinguish between them. Finally, we create a ``silence'' class by extracting one-second chunks from the background noise files provided in the dataset, ensuring they match the duration of other audio samples.
 
-# Dataset Size and Class Distribution
+### Dataset Size and Class Distribution
 
 The dataset is pre-split into training, validation, and test sets by the dataset creators, with mutually exclusive speakers across splits to ensure proper generalization evaluation. We use these predefined splits without modification. The test set contains 11,046 samples with the following class distribution: the ``unknown'' class dominates with 6,931 samples (62.8\%), each of the 10 core command classes contains approximately 400 samples (ranging from 396 to 425 samples, approximately 3.6\% each), and the ``silence'' class contains 41 samples (0.4\%). This significant class imbalance poses challenges for model training, as the model may bias predictions toward the dominant ``unknown'' class.
 
-# Ethical Concerns
+### Ethical Concerns
 
 The Google Speech Commands dataset was collected through crowdsourcing, which raises several ethical considerations. First, while the dataset includes diverse speakers, the demographic distribution may not be fully representative of global populations, potentially leading to performance disparities across different demographic groups. Second, the dataset contains recordings of individuals' voices, raising privacy concerns; however, the dataset is released under the Creative Commons BY 4.0 license with appropriate consent mechanisms. Third, speech recognition systems trained on such datasets may perpetuate biases if certain accents, dialects, or speech patterns are underrepresented. We acknowledge these concerns and note that our model is intended for research and educational purposes, with careful consideration needed before deployment in real-world applications.
 
-# Pre-processing
+### Pre-processing
 
 We convert raw audio waveforms into 2D Mel spectrograms suitable for CNN processing. Audio files are first converted from stereo to mono (if necessary) and adjusted to exactly one second duration (16,000 samples at 16 kHz), with shorter files padded with silence and longer files truncated. We then use PyTorch's Torchaudio library to generate Mel spectrograms using \texttt{torchaudio.transforms.MelSpectrogram} with 128 mel bins, which provide a frequency representation aligned with human auditory perception by mapping frequencies to the Mel scale and emphasizing perceptually relevant frequency ranges. The transformation uses a Short-Time Fourier Transform (STFT) with appropriate windowing and hop length parameters. Finally, spectrograms are converted to logarithmic scale (log-magnitude) to compress the dynamic range and improve numerical stability during training.
 
-# Data Augmentation
+### Data Augmentation
 
 To improve model generalization and robustness, we apply several data augmentation techniques during training (augmentations are disabled for validation and test sets). Waveforms are randomly shifted left or right by up to 0.2 seconds to simulate variations in utterance timing. Random snippets from background noise files are mixed with audio samples at random Signal-to-Noise Ratios (SNR) between 5 and 20 dB to improve robustness to environmental noise. Random horizontal bands are masked in the spectrogram (masking parameter tuned via Optuna, range 10--40 time frames) to simulate temporal occlusions, while random vertical bands are masked (masking parameter tuned via Optuna, range 5--20 frequency bins) to simulate frequency occlusions and improve robustness to frequency variations. These augmentation techniques are applied stochastically during training, effectively increasing the diversity of training examples and reducing overfitting. The augmentation parameters (time and frequency masking ranges) were optimized as part of the hyperparameter search process described in Section~\ref{sec:model}.
 
-# Exploratory Data Analysis
+### Exploratory Data Analysis
 
 During our exploratory data analysis, we generated figures such as Figure~\ref{fig:spectrogram-example}, which shows an example Mel spectrogram generated from a training sample, illustrating the time-frequency representation used as input to our CNN.
 
@@ -76,7 +76,7 @@ During our exploratory data analysis, we generated figures such as Figure~\ref{f
 
 We implemented a shallow convolutional neural network from scratch specifically designed for speech command classification. The architecture, training procedure, and evaluation methodology are described below.
 
-# Architecture
+### Architecture
 
 Our ShallowSpeechCNN model is a custom architecture implemented from scratch using PyTorch. The network consists of two convolutional blocks followed by fully connected layers:
 
@@ -92,17 +92,17 @@ Our ShallowSpeechCNN model is a custom architecture implemented from scratch usi
 
 Batch normalization stabilizes training, and adaptive pooling allows handling spectrograms of varying temporal lengths.
 
-# Baseline Implementation and Improvements
+### Baseline Implementation and Improvements
 
 Our initial baseline implementation used a standard linear spectrogram transform (\texttt{torchaudio.\allowbreak transforms.\allowbreak Spectrogram}) with instance normalization applied to log-scaled spectrograms. The CNN architecture itself remained unchanged between baseline and improved versions. The baseline employed minimal data augmentation (only random time shifting, as described in Section~\ref{sec:dataset}) and hardcoded hyperparameters (batch size 64, Adam optimizer with learning rate 0.001, 10 training epochs).
 
 The improved implementation introduced several key changes: (1) replacement of linear spectrograms with Mel spectrograms (see Section~\ref{sec:dataset} for pre-processing details); (2) comprehensive data augmentation (see Section~\ref{sec:dataset}); (3) automated hyperparameter optimization using Optuna; and (4) training efficiency improvements including Automatic Mixed Precision (AMP) and enhanced checkpointing for resumable training. These modifications improved feature representation and training resilience while maintaining the same shallow CNN architecture.
 
-# Training Procedure
+### Training Procedure
 
 Training was performed with hyperparameter optimization and several efficiency improvements.
 
-# Loss Function and Optimization
+### Loss Function and Optimization
 
 We used the cross-entropy loss function (as defined in Section~\ref{sec:background}) for multiclass classification. Hyperparameters (optimizer, learning rate, and batch size) were optimized using Optuna~\cite{optuna2019} through automated search on a validation subset, selecting optimal values from candidate ranges for Adam/RMSprop/SGD optimizers, learning rates in $[10^{-5}, 10^{-2}]$, and batch sizes in $\{32, 64, 128\}$. The validation set was used exclusively for hyperparameter selection, ensuring no information leakage to the test set.
 
@@ -111,7 +111,7 @@ We used the cross-entropy loss function (as defined in Section~\ref{sec:backgrou
 The final model was trained for 20 epochs using the best hyperparameters identified by Optuna. We implemented Automatic Mixed Precision (AMP) to improve training efficiency and checkpointing to save model state after each epoch if validation loss improves. Training was performed with reproducibility measures including fixed random seeds.
 
 
-# Evaluation Metrics
+### Evaluation Metrics
 
 Model performance was evaluated using cross-entropy loss, classification accuracy, confusion matrices, and per-class precision, recall, and F1-scores. The test set was used \emph{only} for final evaluation after all hyperparameter tuning and model selection were complete, ensuring no data leakage from the test set into the training process. 
 
@@ -119,11 +119,11 @@ Model performance was evaluated using cross-entropy loss, classification accurac
 
 We present the performance results of our trained CNN model on the test set, along with a comparison to our initial baseline implementation. The final model achieved an overall test accuracy of 81\%.
 
-# Overall Performance
+### Overall Performance
 
 The model achieved a weighted average precision of 0.81, recall of 0.81, and F1-score of 0.79 across all 12 classes on the test set (11,046 samples). The macro-averaged metrics (precision: 0.78, recall: 0.59, F1-score: 0.66) reflect the class imbalance in the dataset, where the ``unknown'' class dominates with 6,931 samples compared to the core command classes (approximately 400 samples each) and the ``silence'' class (41 samples).
 
-# Training Dynamics
+### Training Dynamics
 
 Figure~\ref{fig:training-curves} shows the training and validation loss, along with validation accuracy, over the 20 training epochs. Both training and validation loss decrease throughout training, indicating that the model continued to learn and improve without signs of overfitting. The validation accuracy similarly increases steadily, reaching its peak at the final epoch. This suggests that training for the full 20 epochs was beneficial and that the model had not yet reached its full learning capacity. The training loss appears smoother than the validation loss due to batch averaging and data augmentation.
 
@@ -164,7 +164,7 @@ silence & 0.71 & 0.59 & 0.64 & 41 \\
 
 Some classes exhibit lower recall: ``go'' (0.36), ``no'' (0.39), and ``up'' (0.49), which may reflect acoustic similarities between certain command pairs or insufficient training examples. The ``silence'' class achieves moderate performance (F1-score 0.64), reasonable given its small sample size (41 test samples).
 
-# Confusion Matrix Analysis
+### Confusion Matrix Analysis
 
 The confusion matrix (Table~\ref{tab:confusion-matrix}) reveals several notable misclassification patterns.
 
@@ -196,7 +196,7 @@ The confusion matrix (Table~\ref{tab:confusion-matrix}) reveals several notable 
 
 Notable misclassifications include ``go''/``no'' confusion (34 and 23 samples), ``up''/``off'' confusion (33 and 25 samples), and frequent misclassification of core commands as ``unknown''. This reflects both acoustic similarities between certain pairs and the class imbalance favoring the ``unknown'' class.
 
-# Comparison with Baseline
+### Comparison with Baseline
 
 Compared to our baseline, the improved model achieved gains across classes through Mel spectrograms, comprehensive data augmentation, and automated hyperparameter optimization. Some notable improvements: ``no'' (F1: 0.28 to 0.51), ``on'' (F1: 0.13 to 0.64), ``down'' (F1: 0.52 to 0.65), and ``go'' (F1: 0.41 to 0.47).
 
@@ -225,3 +225,4 @@ Every one of us contributed to the written report.
 ## Acknowledgments
 
 The model inspiration came from the popular ways to analyze the famous Google Speech Commands dataset.
+
